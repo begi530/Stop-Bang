@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수면무호흡 위험도 검사</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #212121;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid #333333;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(79, 22, 212, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4f16d4;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .start-container {
+            text-align: center;
+        }
+
+        .start-container.active {
+            display: block;
+        }
+
+        .start-description {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .start-notice {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            color: #555;
+            font-style: italic;
+        }
+
+        .start-btn {
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border: 2px solid #4f16d4;
+            background: #4f16d4;
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .start-btn:hover {
+            background: #ffffff;
+            color: #4f16d4;
+            transform: translateY(-2px);
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: #4f16d4;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .question-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: 2px solid #333333;
+            background: #ffffff;
+            color: #212121;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .answer-btn:hover {
+            background: #4f16d4;
+            color: #ffffff;
+            border-color: #4f16d4;
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4f16d4;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-container {
+            display: none;
+            text-align: left;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .result-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .result-section h3 {
+            color: #4f16d4;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .result-section p {
+            font-size: 1em;
+            line-height: 1.7;
+        }
+
+        .product-recommendations {
+            margin-top: 30px;
+        }
+
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .product-card {
+            flex: 1;
+            min-width: 180px;
+            max-width: 250px;
+            padding: 15px;
+            border: 2px solid #4f16d4;
+            border-radius: 8px;
+            background: #ffffff;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(79, 22, 212, 0.2);
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .product-image-placeholder {
+            color: #999;
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #4f16d4;
+            font-size: 1.1em;
+        }
+
+        .medical-consultation {
+            background: #f0f8ff;
+            border: 2px solid #4f16d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .medical-consultation h4 {
+            color: #4f16d4;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .medical-consultation p {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .low-risk {
+            color: #28a745;
+        }
+
+        .medium-risk {
+            color: #ffc107;
+        }
+
+        .high-risk {
+            color: #dc3545;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 2px solid #4f16d4;
+            background: #4f16d4;
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-top: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .restart-btn:hover {
+            background: #ffffff;
+            color: #4f16d4;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .answer-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .answer-btn {
+                width: 100%;
+                padding: 12px 20px;
+            }
+
+            .product-grid {
+                flex-direction: column;
+            }
+
+            .product-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>수면무호흡 위험도 검사</h1>
+        
+        <!-- Start Page -->
+        <div class="start-container active" id="startContainer">
+            <div class="start-description">
+                STOP-BANG 기반의 간단한 설문을 통해<br>
+                수면무호흡의 위험도를 확인해보세요.<br><br>
+                총 8개의 질문으로 구성되어 있으며,<br>
+                각 질문에 예/아니오로 답변하시면 됩니다.
+            </div>
+            <div class="start-notice">
+                본 검사는 참고용이며, 정확한 진단과 치료는 수면 전문의의 진료를 통해 이루어져야 합니다.
+            </div>
+            <button class="start-btn" onclick="startSurvey()">검사 진행하기</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">1 / 8</div>
+
+        <!-- Question 1 -->
+        <div class="question-container" id="question1">
+            <div class="question-number">질문 1</div>
+            <div class="question-text">나는 잠잘 때 코를 많이 고는 편이다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(1, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(1, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question-container" id="question2">
+            <div class="question-number">질문 2</div>
+            <div class="question-text">나는 낮 시간에 종종 피곤과 졸림을 느끼는 편이다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(2, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(2, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question-container" id="question3">
+            <div class="question-number">질문 3</div>
+            <div class="question-text">나는 잠잘 때 숨을 헐떡이거나 멈추는 경우가 있다고 들은 적이 있다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(3, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(3, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question-container" id="question4">
+            <div class="question-number">질문 4</div>
+            <div class="question-text">나는 고혈압이 있다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(4, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(4, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question-container" id="question5">
+            <div class="question-number">질문 5</div>
+            <div class="question-text">체질량 지수(BMI)가 35kg/m² 이상이다.</div>
+            <div class="question-note">BMI 계산법: 체중(kg)/신장(m)²</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(5, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(5, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="question-container" id="question6">
+            <div class="question-number">질문 6</div>
+            <div class="question-text">나는 나이가 50세 이상이다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(6, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(6, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="question-container" id="question7">
+            <div class="question-number">질문 7</div>
+            <div class="question-text">목젖 주위가 남자일 경우 17인치, 여자일 경우 16인치 이상이다.</div>
+            <div class="question-note">17인치=43cm, 16인치=41cm</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(7, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(7, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="question-container" id="question8">
+            <div class="question-number">질문 8</div>
+            <div class="question-text">나는 남자이다.</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="answerQuestion(8, true)">예</button>
+                <button class="answer-btn" onclick="answerQuestion(8, false)">아니오</button>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-container" id="resultContainer">
+            <div class="result-title" id="resultTitle"></div>
+            
+            <div class="result-section">
+                <h3>진단 결과</h3>
+                <p id="diagnosisText"></p>
+            </div>
+            
+            <div class="result-section">
+                <h3>솔루션</h3>
+                <p id="solutionText"></p>
+            </div>
+            
+            <div class="product-recommendations">
+                <h3 style="color: #4f16d4; text-align: center; margin-bottom: 15px;">추천 제품</h3>
+                <div class="product-grid" id="productGrid"></div>
+            </div>
+            
+            <button class="restart-btn" onclick="restartSurvey()">다시 검사하기</button>
+        </div>
+    </div>
+
+    <script>
+        let answers = {};
+        let currentQuestion = 1;
+        const totalQuestions = 8;
+
+        function startSurvey() {
+            document.getElementById('startContainer').style.display = 'none';
+            document.querySelector('.progress-bar').style.display = 'block';
+            document.querySelector('.progress-text').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('question1').classList.add('active');
+                updateProgress();
+            }, 300);
+        }
+
+        function answerQuestion(questionNum, answer) {
+            answers[questionNum] = answer;
+            
+            if (questionNum < totalQuestions) {
+                // Hide current question
+                document.getElementById(`question${questionNum}`).classList.remove('active');
+                
+                // Show next question
+                setTimeout(() => {
+                    currentQuestion = questionNum + 1;
+                    document.getElementById(`question${currentQuestion}`).classList.add('active');
+                    updateProgress();
+                }, 300);
+            } else {
+                // Show results
+                setTimeout(() => {
+                    document.getElementById(`question${questionNum}`).classList.remove('active');
+                    showResults();
+                }, 300);
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${currentQuestion} / ${totalQuestions}`;
+        }
+
+        function showResults() {
+            // Count 'yes' answers
+            const yesCount = Object.values(answers).filter(answer => answer === true).length;
+            
+            let riskLevel, riskClass, diagnosis, solution, products, showMedicalConsultation = false;
+            
+            // Check for high risk criteria first
+            const firstFourYes = [1, 2, 3, 4].filter(i => answers[i] === true).length;
+            const lastFourYes = [5, 6, 7, 8].filter(i => answers[i] === true).length;
+            const isHighRisk = (yesCount >= 5) || (firstFourYes >= 2 && lastFourYes >= 1);
+            
+            if (yesCount <= 2) {
+                riskLevel = "폐쇄수면무호흡 저위험";
+                riskClass = "low-risk";
+                diagnosis = "현재 설문 결과에 따르면 폐쇄성 수면무호흡증의 가능성은 낮은 편입니다. 다만 피로감이나 코골이 등 불편한 증상이 지속된다면, 생활습관을 조절하거나 필요 시 전문의 상담을 권장합니다.";
+                solution = "위험도는 낮지만, 증상이 있거나 예방 차원에서 생활습관 관리가 필요합니다.";
+                products = [
+                    {name: "파사 시너지 베개", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150238&&ca_id=10&page=1", image:"./pilow.jpg"},
+                    {name: "파사 밴드", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150229&&ca_id=10&page=1", image:"./band.jpg"},
+                    {name: "파사 코호흡 테이프", link: "https://www.pasa.co.kr/shop/item.php?it_id=1658460475&&ca_id=10&page=1", image:"./tape.jpg"}
+                ];
+            } else if (isHighRisk) {
+                riskLevel = "폐쇄수면무호흡 고위험";
+                riskClass = "high-risk";
+                diagnosis = "설문 결과, 폐쇄성 수면무호흡증의 위험이 높게 나타났습니다. 이는 건강에 다양한 영향을 줄 수 있으므로, 가까운 병원에서 전문적인 진단(수면다원검사)과 치료 상담을 받으시기를 적극 권장합니다.";
+                solution = "고위험군은 반드시 수면 전문의 상담 및 검사가 필요합니다. 그와 함께 보조 기구 활용으로 증상 완화를 도울 수 있습니다.";
+                showMedicalConsultation = true;
+                products = [
+                    {name: "파사 코골이", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150356&&ca_id=10&page=1", image:"./nose.jpg"},
+                    {name: "파사 이갈이", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150305&&ca_id=10&page=1", image:"./teeth.jpg"},
+                    {name: "파사 시너지 베개", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150238&&ca_id=10&page=1", image:"./pilow.jpg"},
+                    {name: "파사 밴드", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150229&&ca_id=10&page=1", image:"./band.jpg"},
+                    {name: "파사 코호흡 테이프", link: "https://www.pasa.co.kr/shop/item.php?it_id=1658460475&&ca_id=10&page=1", image:"./tape.jpg"}
+                ];
+            } else {
+                riskLevel = "폐쇄수면무호흡 중간위험";
+                riskClass = "medium-risk";
+                diagnosis = "설문 결과, 폐쇄성 수면무호흡증의 위험이 중간 수준으로 나타났습니다. 코골이, 주간 졸림, 혈압 관리 상태 등을 주의 깊게 살펴보는 것이 좋습니다. 증상이 생활에 영향을 주거나 악화되는 경우에는 수면검사(수면다원검사)를 고려해 보세요.";
+                solution = "중간 수준의 위험이 있으므로 적극적인 생활 관리와 보조 기구 활용을 권장합니다.";
+                products = [
+                    {name: "파사 코골이", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150356&&ca_id=10&page=1", image:"./nose.jpg"},
+                    {name: "파사 이갈이", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150305&&ca_id=10&page=1", image:"./teeth.jpg"},
+                    {name: "파사 밴드", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150229&&ca_id=10&page=1", image:"./band.jpg"},
+                    {name: "파사 코호흡 테이프", link: "https://www.pasa.co.kr/shop/item.php?it_id=1658460475&&ca_id=10&page=1", image:"./tape.jpg"},
+                    {name: "파사 시너지 베개", link: "https://www.pasa.co.kr/shop/item.php?it_id=1652150238&&ca_id=10&page=1", image:"./pilow.jpg"}
+                ];
+            }
+            
+            // Set result content
+            document.getElementById('resultTitle').textContent = riskLevel;
+            document.getElementById('resultTitle').className = `result-title ${riskClass}`;
+            document.getElementById('diagnosisText').textContent = diagnosis;
+            document.getElementById('solutionText').textContent = solution;
+            
+            // Create product recommendations section
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = '';
+            
+            // Add medical consultation box for high risk
+            if (showMedicalConsultation) {
+                const medicalBox = document.createElement('div');
+                medicalBox.className = 'medical-consultation';
+                medicalBox.innerHTML = `
+                    <h4>🏥 전문의 상담 권장</h4>
+                    <p>고위험군으로 분류되었습니다.<br>수면 전문의와의 상담 및 정밀 검사를 받아보시기 바랍니다.</p>
+                `;
+                document.querySelector('.product-recommendations').insertBefore(medicalBox, productGrid);
+            }
+            
+            // Add product cards
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" onerror="this.parentNode.innerHTML='<div class=\\'product-image-placeholder\\'>${product.icon}</div>'">` : 
+                            `<div class="product-image-placeholder">${product.icon}</div>`
+                        }
+                    </div>
+                    <div class="product-name">${product.name}</div>
+                `;
+                productCard.onclick = () => window.open(product.link, '_blank');
+                productGrid.appendChild(productCard);
+            });
+            
+            // Hide progress bar and show results
+            document.querySelector('.progress-bar').style.display = 'none';
+            document.querySelector('.progress-text').style.display = 'none';
+            document.getElementById('resultContainer').classList.add('active');
+        }
+
+        function restartSurvey() {
+            answers = {};
+            currentQuestion = 1;
+            
+            // Hide result
+            document.getElementById('resultContainer').classList.remove('active');
+            
+            // Remove any medical consultation boxes that might have been added
+            const medicalBoxes = document.querySelectorAll('.medical-consultation');
+            medicalBoxes.forEach(box => box.remove());
+            
+            // Show start page again
+            setTimeout(() => {
+                document.getElementById('startContainer').style.display = 'block';
+                document.getElementById('startContainer').classList.add('active');
+                
+                // Hide all questions
+                for (let i = 1; i <= totalQuestions; i++) {
+                    document.getElementById(`question${i}`).classList.remove('active');
+                }
+                
+                // Reset progress
+                document.querySelector('.progress-bar').style.display = 'none';
+                document.querySelector('.progress-text').style.display = 'none';
+                document.getElementById('progressFill').style.width = '0%';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
